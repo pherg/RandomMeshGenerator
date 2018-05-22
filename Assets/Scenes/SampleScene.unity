@@ -158,7 +158,7 @@ Light:
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_Lightmapping: 1
+  m_Lightmapping: 4
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
@@ -280,8 +280,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf54ac498c4d7c0409a881e95a7e3d88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  drawGizmos: 0
   _meshFilter: {fileID: 1773627269}
-  jumbleAmount: {x: 0.33, y: 0.33, z: 0.15}
+  jumbleAmount: {x: 0.33, y: 0.33, z: 0.33}
+  cellSize: 1
+  GridSizeX: 100
+  GridSizeY: 100
 --- !u!33 &1773627269
 MeshFilter:
   m_ObjectHideFlags: 0

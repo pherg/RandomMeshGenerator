@@ -3,21 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class TerrainPlane : MonoBehaviour {
-
+    public bool drawGizmos = true;
     public MeshFilter _meshFilter;
     public Vector3 jumbleAmount = new Vector3(0.5f, 0.5f, 0.5f);
+    public float cellSize = 1;
     Vector3[] _verticies;
     int[] _tris;
     Vector2[] _uvs;
-    int _xSize = 5;
-    int _ySize = 5;
+    public int GridSizeX = 5;
+    public int GridSizeY = 5;
 
     void Awake()
     {
-        _verticies = TerrainPlane.CreateVertices(_xSize, _ySize);
+        _verticies = TerrainPlane.CreateVertices(GridSizeX, GridSizeY, cellSize);
         JumbleVertz(_verticies, jumbleAmount);
-        _tris = TerrainPlane.CreateTris(_xSize, _ySize);
-        _uvs = TerrainPlane.CreateUVs(_xSize, _ySize);
+        _tris = TerrainPlane.CreateTris(GridSizeX, GridSizeY);
+        _uvs = TerrainPlane.CreateUVs(GridSizeX, GridSizeY);
         Render.DrawVerts(_meshFilter.mesh, _verticies, _tris, _uvs);
 
         StartCoroutine(DoThings());
@@ -27,21 +28,21 @@ public class TerrainPlane : MonoBehaviour {
     {
         while (true)
         {
-            Vector3[] newVerts = TerrainPlane.CreateVertices(_xSize, _ySize);
+            Vector3[] newVerts = TerrainPlane.CreateVertices(GridSizeX, GridSizeY, cellSize);
             float time = 0;
-            float lerpTimeLength = 4f;
+            float lerpTimeLength = 1f;
             JumbleVertz(newVerts, jumbleAmount);
             float t = 0;
-            while (t <= lerpTimeLength)
+            while (time <= lerpTimeLength)
             {
-                t = time / lerpTimeLength;
+                t = Time.deltaTime / lerpTimeLength;
                 
                 for (int i = 0; i < newVerts.Length; ++i)
                 {
                     _verticies[i] = Vector3.Lerp(_verticies[i], newVerts[i], t);
                 }
-                yield return 0;
-                Debug.Log("t: " + t + " Time.deltaTime: " + Time.deltaTime);
+                yield return null;
+                
                 time += Time.deltaTime;
                 Render.DrawVerts(_meshFilter.mesh, _verticies, _tris, _uvs);
             }
@@ -59,7 +60,7 @@ public class TerrainPlane : MonoBehaviour {
         }
     }
 
-    public static Vector3[] CreateVertices(int xSize, int ySize)
+    public static Vector3[] CreateVertices(int xSize, int ySize, float cellSize)
     {
         Vector3[] vertices = new Vector3[(xSize + 1) * (ySize + 1)];
         
@@ -67,9 +68,10 @@ public class TerrainPlane : MonoBehaviour {
         {
             for (int x = 0; x <= xSize; x++, i++)
             {
-                vertices[i] = new Vector3(x, 0, y);
+                vertices[i] = new Vector3(x * cellSize, 0, y * cellSize);
             }
         }
+        
         return vertices;
     }
 
@@ -107,6 +109,10 @@ public class TerrainPlane : MonoBehaviour {
 
     private void OnDrawGizmos()
     {
+        if (!drawGizmos)
+        {
+            return;
+        }
         Gizmos.color = Color.black;
         if(_verticies != null)
         {
