@@ -4,37 +4,50 @@ using UnityEngine;
 
 public class Grid2D {
 
-    int _x;
-    int _y;
-
-    public void SetSize(int x, int y)
+    public static Vector3[] CreateVertices(int xSize, int ySize, float cellSize)
     {
-        _x = x;
-        _y = y;
-    }
+        Vector3[] vertices = new Vector3[(xSize + 1) * (ySize + 1)];
 
-    public static Vector3[] CreateVertices(int x, int y, float cellSize)
-    {
-        Vector3[] verts = new Vector3[(x+1) * (y+1)];
-        for(int i = 0; i < x; ++i)
+        for (int i = 0, y = 0; y <= ySize; y++)
         {
-            for(int j = 0; j < y; ++j)
+            for (int x = 0; x <= xSize; x++, i++)
             {
-
+                vertices[i] = new Vector3(x * cellSize, 0, y * cellSize);
             }
         }
-        verts[0] = new Vector3(0, 0, 0);
-        verts[1] = new Vector3(0, 0, 1);
-        verts[2] = new Vector3(1, 0, 0);
-        return verts;
+
+        return vertices;
     }
 
-    public static int[] CreateTris()
+    public static int[] CreateTris(int xSize, int ySize)
     {
-        int[] tris = new int[3];
-        tris[0] = 0;
-        tris[1] = 1;
-        tris[2] = 2;
+        int[] tris = new int[xSize * ySize * 6];
+
+        for (int ti = 0, y = 0, v = 0; y < ySize; ++y, ++v)
+        {
+            for (int x = 0; x < xSize; ++x, ti += 6, ++v)
+            {
+                tris[ti] = v;
+                tris[ti + 1] = v + xSize + 1;
+                tris[ti + 2] = v + 1;
+                tris[ti + 3] = v + 1;
+                tris[ti + 4] = v + xSize + 1;
+                tris[ti + 5] = v + xSize + 2;
+            }
+        }
         return tris;
+    }
+
+    public static Vector2[] CreateUVs(int xSize, int ySize)
+    {
+        Vector2[] uv = new Vector2[(xSize + 1) * (ySize + 1)];
+        for (int i = 0, y = 0; y <= ySize; y++)
+        {
+            for (int x = 0; x <= xSize; x++, i++)
+            {
+                uv[i] = new Vector2((float)x / xSize, (float)y / ySize);
+            }
+        }
+        return uv;
     }
 }

@@ -3,35 +3,64 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class TerrainPlane : MonoBehaviour {
+
     public bool drawGizmos = true;
-    public MeshFilter _meshFilter;
-    public Vector3 jumbleAmount = new Vector3(0.5f, 0.5f, 0.5f);
-    public float cellSize = 1;
+
+    public TerrainModel _terrainModel;
+
     Vector3[] _verticies;
     int[] _tris;
     Vector2[] _uvs;
-    public int GridSizeX = 5;
-    public int GridSizeY = 5;
+    int GridSizeX;
+    int GridSizeY;
+    float cellSize;
+    Vector3 jumbleAmount;
+    MeshFilter _meshFilter;
 
     void Awake()
     {
-        _verticies = TerrainPlane.CreateVertices(GridSizeX, GridSizeY, cellSize);
-        JumbleVertz(_verticies, jumbleAmount);
-        _tris = TerrainPlane.CreateTris(GridSizeX, GridSizeY);
-        _uvs = TerrainPlane.CreateUVs(GridSizeX, GridSizeY);
+        InitializeModel();
+
+        int resolution = 256;
+        Texture2D texture = new Texture2D(resolution, resolution, TextureFormat.RGB24, true);
+        texture.name = "Procedural Texture";
+        GetComponent<MeshRenderer>().material.mainTexture = texture;
+        Render.FillTexture(resolution, texture);
+
+        TerrainModel.JumbleVertz(_verticies, jumbleAmount);
+
         Render.DrawVerts(_meshFilter.mesh, _verticies, _tris, _uvs);
 
         StartCoroutine(DoThings());
+    }
+
+    void InitializeModel()
+    {
+        _terrainModel.CalculateModel();
+        ReadSettings(_terrainModel);
+    }
+
+    private void ReadSettings(TerrainModel tModel)
+    {
+        _verticies = tModel.vertices;
+        _tris = tModel.tris;
+        _uvs = tModel.uvs;
+
+        GridSizeX = tModel.GridSizeX;
+        GridSizeY = tModel.GridSizeY;
+        cellSize = tModel.cellSize;
+        jumbleAmount = tModel.jumbleAmount;
+        _meshFilter = tModel.meshFilter;
     }
 
     IEnumerator DoThings()
     {
         while (true)
         {
-            Vector3[] newVerts = TerrainPlane.CreateVertices(GridSizeX, GridSizeY, cellSize);
+            Vector3[] newVerts = Grid2D.CreateVertices(GridSizeX, GridSizeY, cellSize);
             float time = 0;
             float lerpTimeLength = 1f;
-            JumbleVertz(newVerts, jumbleAmount);
+            TerrainModel.JumbleVertz(newVerts, _terrainModel.jumbleAmount);
             float t = 0;
             while (time <= lerpTimeLength)
             {
@@ -46,65 +75,8 @@ public class TerrainPlane : MonoBehaviour {
                 time += Time.deltaTime;
                 Render.DrawVerts(_meshFilter.mesh, _verticies, _tris, _uvs);
             }
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.0f);
         }
-    }
-
-    void JumbleVertz(Vector3[] verts, Vector3 jumbleAmount)
-    {
-        for(int i = 0; i < verts.Length; ++i)
-        {
-            verts[i] = new Vector3( verts[i].x + Random.Range(-jumbleAmount.x, jumbleAmount.x), 
-                                    verts[i].y + Random.Range(-jumbleAmount.y, jumbleAmount.y),
-                                    verts[i].z + Random.Range(-jumbleAmount.z, jumbleAmount.z));
-        }
-    }
-
-    public static Vector3[] CreateVertices(int xSize, int ySize, float cellSize)
-    {
-        Vector3[] vertices = new Vector3[(xSize + 1) * (ySize + 1)];
-        
-        for (int i = 0, y = 0; y <= ySize; y++)
-        {
-            for (int x = 0; x <= xSize; x++, i++)
-            {
-                vertices[i] = new Vector3(x * cellSize, 0, y * cellSize);
-            }
-        }
-        
-        return vertices;
-    }
-
-    public static int[] CreateTris(int xSize, int ySize)
-    {
-        int[] tris = new int[xSize * ySize * 6];
-        
-        for (int ti = 0, y = 0, v = 0; y < ySize; ++y, ++v){
-            for (int x = 0; x < xSize; ++x, ti += 6, ++v)
-            {
-                tris[ti] = v;
-                tris[ti + 1] = v + xSize + 1;
-                tris[ti + 2] = v + 1;
-                tris[ti + 3] = v + 1;
-                tris[ti + 4] = v + xSize + 1;
-                tris[ti + 5] = v + xSize + 2;
-
-            }
-        }
-        return tris;
-    }
-
-    public static Vector2[] CreateUVs(int xSize, int ySize)
-    {
-        Vector2[] uv = new Vector2[(xSize+1)*(ySize+1)];
-        for (int i = 0, y = 0; y <= ySize; y++)
-        {
-            for (int x = 0; x <= xSize; x++, i++)
-            {
-                uv[i] = new Vector2(x / xSize, y / ySize);
-            }
-        }
-        return uv;
     }
 
     private void OnDrawGizmos()
@@ -122,12 +94,14 @@ public class TerrainPlane : MonoBehaviour {
             }
             if (_tris != null)
             {
-                for (int i = 0; i < _tris.Length - 1; i++)
+                for (int i = 0; i < _tris.Length - 1; i+=3)
                 {
-                    Gizmos.DrawLine(_verticies[_tris[i]], _verticies[_tris[i + 1]]);
+                    Gizmos.DrawLine(_verticies[_tris[i]], _verticies[_tris[i+1]]);
+                    Gizmos.DrawLine(_verticies[_tris[i+1]], _verticies[_tris[i+2]]);
+                    Gizmos.DrawLine(_verticies[_tris[i+2]], _verticies[_tris[i]]);
                 }
             }
-        }        
+        }
     }
 }
 

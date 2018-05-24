@@ -11,4 +11,17 @@ public class Render {
         mesh.uv = uvs;
         mesh.RecalculateNormals();
     }
+
+    public static void FillTexture(int resolution, Texture2D texture)
+    {
+        float stepSize = 1f / resolution;
+        for (int y = 0; y < resolution; y++)
+        {
+            for (int x = 0; x < resolution; x++)
+            {
+                texture.SetPixel(x, y, new Color(x * stepSize, y * stepSize, 0f));
+            }
+        }
+        texture.Apply();
+    }
 }
