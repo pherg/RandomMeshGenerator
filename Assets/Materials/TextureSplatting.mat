@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: UV_Grid_Sm
-  m_Shader: {fileID: 4800000, guid: cb2c4ea124bd8924fb8a4bddebeca862, type: 3}
+  m_Name: TextureSplatting
+  m_Shader: {fileID: 4800000, guid: 9e0a3c11bc696d74d8f4cbe11b9cb102, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -37,11 +37,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
         m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
+        m_Scale: {x: 10, y: 10}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: b8865fc5c466e3e42b882c5ee8ccaa57, type: 3}
-        m_Scale: {x: 0.25, y: 0.25}
+        m_Texture: {fileID: 2800000, guid: a370e04a413d5df4199772648c5100fc, type: 3}
+        m_Scale: {x: 4, y: 4}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}
@@ -53,6 +53,22 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
         m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture1:
+        m_Texture: {fileID: 2800000, guid: df253c1b3c7ca3540b527564f135f225, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture2:
+        m_Texture: {fileID: 2800000, guid: 118b60e058b18db4f8d04f76d44bc7cb, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture3:
+        m_Texture: {fileID: 2800000, guid: 2cafec71b70fd8545b366f50d4e0a279, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture4:
+        m_Texture: {fileID: 2800000, guid: 09954351a0e06ed48a0b546d1838c574, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
@@ -75,4 +91,4 @@ Material:
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _Tint: {r: 1, g: 1, b: 1, a: 1}
+    - _Tint: {r: 1, g: 0, b: 0, a: 1}

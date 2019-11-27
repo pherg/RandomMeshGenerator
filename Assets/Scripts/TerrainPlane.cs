@@ -13,7 +13,7 @@ public class TerrainPlane : MonoBehaviour {
     Vector2[] _uvs;
     int GridSizeX;
     int GridSizeY;
-    float cellSize;
+    Vector2 cellSize;
     Vector3 jumbleAmount;
     MeshFilter _meshFilter;
 
@@ -21,11 +21,11 @@ public class TerrainPlane : MonoBehaviour {
     {
         InitializeModel();
 
-        int resolution = 256;
-        Texture2D texture = new Texture2D(resolution, resolution, TextureFormat.RGB24, true);
-        texture.name = "Procedural Texture";
-        GetComponent<MeshRenderer>().material.mainTexture = texture;
-        Render.FillTexture(resolution, texture);
+        //int resolution = 256;
+        //Texture2D texture = new Texture2D(resolution, resolution, TextureFormat.RGB24, true);
+        //texture.name = "Procedural Texture";
+        //GetComponent<MeshRenderer>().material.mainTexture = texture;
+        //Render.FillTexture(resolution, texture);
 
         TerrainModel.JumbleVertz(_verticies, jumbleAmount);
 
@@ -55,27 +55,30 @@ public class TerrainPlane : MonoBehaviour {
 
     IEnumerator DoThings()
     {
+        Vector3[] initialVerts = new Vector3[_verticies.Length];
         while (true)
         {
-            Vector3[] newVerts = Grid2D.CreateVertices(GridSizeX, GridSizeY, cellSize);
+
+            Vector3[] newVerts = Grid2D.CreateVertices(GridSizeX, GridSizeY, cellSize.x, cellSize.y);
             float time = 0;
             float lerpTimeLength = 1f;
             TerrainModel.JumbleVertz(newVerts, _terrainModel.jumbleAmount);
             float t = 0;
-            while (time <= lerpTimeLength)
+            System.Array.Copy(_verticies, initialVerts, _verticies.Length);
+            do
             {
-                t = Time.deltaTime / lerpTimeLength;
-                
+                time += Time.deltaTime;
+                t = time / lerpTimeLength;
                 for (int i = 0; i < newVerts.Length; ++i)
                 {
-                    _verticies[i] = Vector3.Lerp(_verticies[i], newVerts[i], t);
+                    _verticies[i] = Vector3.Lerp(initialVerts[i], newVerts[i], t);
                 }
-                yield return null;
-                
-                time += Time.deltaTime;
                 Render.DrawVerts(_meshFilter.mesh, _verticies, _tris, _uvs);
-            }
-            yield return new WaitForSeconds(0.0f);
+                yield return null;
+            } while (time <= lerpTimeLength);
+            Render.DrawVerts(_meshFilter.mesh, newVerts, _tris, _uvs);
+            yield return new WaitForSeconds(2.0f);
+            
         }
     }
 
@@ -90,15 +93,15 @@ public class TerrainPlane : MonoBehaviour {
         {
             for (int i = 0; i < _verticies.Length; i++)
             {
-                Gizmos.DrawSphere(_verticies[i], 0.1f);
+                Gizmos.DrawSphere(_verticies[i] + transform.position, 0.1f);
             }
             if (_tris != null)
             {
                 for (int i = 0; i < _tris.Length - 1; i+=3)
                 {
-                    Gizmos.DrawLine(_verticies[_tris[i]], _verticies[_tris[i+1]]);
-                    Gizmos.DrawLine(_verticies[_tris[i+1]], _verticies[_tris[i+2]]);
-                    Gizmos.DrawLine(_verticies[_tris[i+2]], _verticies[_tris[i]]);
+                    Gizmos.DrawLine(_verticies[_tris[i]] + transform.position, _verticies[_tris[i+1]] + transform.position);
+                    Gizmos.DrawLine(_verticies[_tris[i+1]] + transform.position, _verticies[_tris[i+2]] + transform.position);
+                    Gizmos.DrawLine(_verticies[_tris[i+2]] + transform.position, _verticies[_tris[i]] + transform.position);
                 }
             }
         }
